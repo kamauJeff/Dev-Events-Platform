@@ -5,10 +5,11 @@ import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 import { cacheLife } from "next/cache";
+import { getBaseUrl } from "@/lib/utils";
 
 export const instant = false;
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+const BASE_URL = getBaseUrl();
 
 
 const EventDetailItem = ({icon, alt, label}: {icon: string; alt: string; label: string}) => (
