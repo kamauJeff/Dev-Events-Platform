@@ -33,7 +33,7 @@ const SplitText = ({
 
   useEffect(() => {
     if (document.fonts.status === 'loaded') {
-      setFontsLoaded(true);
+      Promise.resolve().then(() => setFontsLoaded(true));
     } else {
       document.fonts.ready.then(() => {
         setFontsLoaded(true);
@@ -51,7 +51,7 @@ const SplitText = ({
       if (el._rbsplitInstance) {
         try {
           el._rbsplitInstance.revert();
-        } catch (_) {
+        } catch {
           /* noop */
         }
         el._rbsplitInstance = null;
@@ -122,7 +122,7 @@ const SplitText = ({
         });
         try {
           splitInstance.revert();
-        } catch (_) {
+        } catch {
           /* noop */
         }
         el._rbsplitInstance = null;
