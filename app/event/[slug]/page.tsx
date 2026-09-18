@@ -3,14 +3,9 @@ import { notFound } from "next/navigation";
 import type { IEvent } from "@/database";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
-import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
-import { cacheLife } from "next/cache";
-import { getBaseUrl } from "@/lib/utils";
+import { getEventBySlug, getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 
 export const instant = false;
-
-const BASE_URL = getBaseUrl();
-
 
 const EventDetailItem = ({icon, alt, label}: {icon: string; alt: string; label: string}) => (
     <div className="flex-row-gap-2 items-center">
@@ -47,24 +42,12 @@ const EventDetailsPage = async ({
 }: {
   params: Promise<{ slug: string }>;
 }) => {
-    'use cache'
-    cacheLife('hours')
-
   const { slug } = await params;
-  const response = await fetch(
-    `${BASE_URL}/api/events/${encodeURIComponent(slug)}`,
-    { cache: "no-store" }
-  );
+    const event = await getEventBySlug(slug);
 
-  if (response.status === 404) {
+    if (!event) {
     notFound();
   }
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch event details (${response.status}).`);
-  }
-
-    const { event } = (await response.json()) as { event: IEvent };
     const { _id: eventId, description, image, overview, date, time, location, mode, agenda, audience, tags, organizer } = event;
 
   if (!description) {
