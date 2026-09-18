@@ -1,18 +1,31 @@
-'use client'
-import { event } from 'next/dist/build/output/log';
-import React, { useState } from 'react'
+'use client';
 
-const BookEvent = () => {
+import React, { useState } from 'react';
+import { createBooking } from '@/lib/actions/booking.action';
+import { posthog } from 'posthog-js';
+
+const BookEvent = ({ eventId, slug }: { eventId: string, slug: string }) => {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+        setIsSubmitting(true);
 
-        setTimeout (() =>{
-            setSubmitted (true);
+        const result = await createBooking({ eventId, email });
+        setIsSubmitting(false);
 
-        }, 1000)
+        if (result.success) {
+            setSubmitted(true);
+            posthog.capture('event_booked', { eventId, slug, email });
+        } else {
+            const message = result.error ?? 'Booking creation failed.';
+            setError(message);
+            console.error('Booking creation failed', message);
+        }
 
     }
 
@@ -32,9 +45,12 @@ const BookEvent = () => {
                     />
                 </div>
 
+                {error && <p className="text-sm text-red-500">{error}</p>}
+
                 <button type="submit"
-                className="button-submit">
-                    Submit
+                className="button-submit"
+                disabled={isSubmitting}>
+                    {isSubmitting ? 'Submitting...' : 'Submit'}
                 </button>
             </form>
         )}
