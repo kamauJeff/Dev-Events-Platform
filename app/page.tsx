@@ -1,10 +1,12 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
 import { getEvents } from "@/lib/actions/event.actions";
+import { connection } from "next/server";
 
 export const instant = false;
 
 const page = async () => {
+  await connection();
   const events = await getEvents();
 
 
