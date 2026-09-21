@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { createBooking } from '@/lib/actions/booking.action';
 import { posthog } from 'posthog-js';
+import Link from 'next/link';
 
-const BookEvent = ({ eventId, slug }: { eventId: string, slug: string }) => {
-    const [email, setEmail] = useState('');
+const BookEvent = ({ eventId, slug, isAuthenticated }: { eventId: string, slug: string, isAuthenticated: boolean }) => {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,12 +15,12 @@ const BookEvent = ({ eventId, slug }: { eventId: string, slug: string }) => {
         setError('');
         setIsSubmitting(true);
 
-        const result = await createBooking({ eventId, email });
+        const result = await createBooking({ eventId });
         setIsSubmitting(false);
 
         if (result.success) {
             setSubmitted(true);
-            posthog.capture('event_booked', { eventId, slug, email });
+            posthog.capture('event_booked', { eventId, slug });
         } else {
             const message = result.error ?? 'Booking creation failed.';
             setError(message);
@@ -31,20 +31,15 @@ const BookEvent = ({ eventId, slug }: { eventId: string, slug: string }) => {
 
   return (
     <div id= "book-event">
-        {submitted ? (
+        {!isAuthenticated ? (
+            <>
+                <p className="text-sm">Sign in before booking your spot.</p>
+                <Link href="/auth/login" className="button-submit">Log in to book</Link>
+            </>
+        ) : submitted ? (
             <p className="text-sm">Thank you for signing up!</p>
         ):(
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="email">Email Address</label>
-                    <input type="email" 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    id="email"
-                    placeholder="Enter your Email Address"            
-                    />
-                </div>
-
                 {error && <p className="text-sm text-red-500">{error}</p>}
 
                 <button type="submit"

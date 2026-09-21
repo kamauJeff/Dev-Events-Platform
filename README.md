@@ -35,4 +35,19 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Set `NEXT_PUBLIC_BASE_URL` in Vercel project settings to the full deployment URL, including the protocol, for example `https://dev-events-platform.vercel.app`.
 
+## Authentication
+
+Authentication uses GitHub through NextAuth. Create a GitHub OAuth App with this callback URL for local development:
+
+`http://localhost:3000/api/auth/callback/github`
+
+Add these values to `.env.local`:
+
+```env
+GITHUB_ID=your_github_oauth_client_id
+GITHUB_SECRET=your_github_oauth_client_secret
+NEXTAUTH_SECRET=your_generated_secret
+NEXTAUTH_URL=http://localhost:3000
+```
+
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

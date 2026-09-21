@@ -4,6 +4,8 @@ import type { IEvent } from "@/database";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 import { getEventBySlug, getSimilarEventsBySlug } from "@/lib/actions/event.actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/src/auth";
 
 export const instant = false;
 
@@ -44,6 +46,7 @@ const EventDetailsPage = async ({
 }) => {
   const { slug } = await params;
     const event = await getEventBySlug(slug);
+    const session = await getServerSession(authOptions);
 
     if (!event) {
     notFound();
@@ -109,7 +112,11 @@ const EventDetailsPage = async ({
                         <p className="text-sm">Be the first o book your spot!</p>
                     )}
 
-                    <BookEvent eventId={eventId.toString()} slug={event.slug} />
+                    <BookEvent
+                        eventId={eventId.toString()}
+                        slug={event.slug}
+                        isAuthenticated={Boolean(session?.user?.email)}
+                    />
 
                 </div>
             </aside>
